@@ -20,9 +20,12 @@
 (def dx 10)
 (def dy 10)
 
+(def xt 0)
+(def yt 0)
+
 (defn draw-ball []
   (.beginPath ctx)
-  (.arc ctx x y ball-radius 0 (* Math.PI 2) false)
+  (.arc ctx xt yt ball-radius 0 (* Math.PI 2) false)
   (aset ctx "fillStyle" "#0095DD")
   (.fill ctx)
   (.closePath ctx))
@@ -31,8 +34,7 @@
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
   (set! t (+ t dt))
-  (set! x (* dx t))
-  ;;(set! y (+ y (* (/ 1 2) g (* t t))))
-  (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) (- (. canvas -height) ball-radius)))
+  (set! xt (* dx t))
+  (set! yt (+ (- (* (/ 1 2) g (* t t)) (* dy t)) y))
   (js/requestAnimationFrame draw))
 (draw)
