@@ -1,4 +1,1 @@
-^{:watch-dirs ["test" "src"]
-  :css-dirs ["resources/public/css"]
-  :auto-testing true}
 {:main side-scroll-1.core}
