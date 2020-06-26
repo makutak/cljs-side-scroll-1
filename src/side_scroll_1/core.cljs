@@ -20,12 +20,31 @@
 (def dx 10)
 (def dy 10)
 
-(def xt 0)
-(def yt 0)
+(def right-pressed false)
+(def left-pressed false)
+
+(defn key-down-handler [e]
+  (let [pressed (. e -key)]
+    (if (or (= "Right" pressed)
+            (= "ArrowRight" pressed))
+      (set! right-pressed true))
+    (if (or (= "Left" pressed)
+            (= "ArrowLeft" pressed))
+      (set! left-pressed true))))
+
+(defn key-up-handler [e]
+  (let [pressed (. e -key)]
+    (if (or (= "Right" pressed)
+            (= "ArrowRight" pressed))
+      (set! right-pressed false))
+    (if (or (= "Left" pressed)
+            (= "ArrowLeft" pressed))
+      (set! left-pressed false))))
+
 
 (defn draw-ball []
   (.beginPath ctx)
-  (.arc ctx xt yt ball-radius 0 (* Math.PI 2) false)
+  (.arc ctx x y ball-radius 0 (* Math.PI 2) false)
   (aset ctx "fillStyle" "#0095DD")
   (.fill ctx)
   (.closePath ctx))
@@ -34,7 +53,19 @@
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
   (set! t (+ t dt))
-  (set! xt (* dx t))
-  (set! yt (+ (- (* (/ 1 2) g (* t t)) (* dy t)) y))
+
+  ;; 右が押されたか
+  (if (true? right-pressed)
+    (set! x (+ x 7)))
+
+  ;; 左が押されたか
+  (if (true? left-pressed)
+    (do
+      (set! x (- x 7))))
+  
+  ;; (set! yt (+ (- (* (/ 1 2) g (* t t)) (* dy t)) y))
   (js/requestAnimationFrame draw))
+
+(js/addEventListener "keydown" key-down-handler false)
+(js/addEventListener "keyup" key-up-handler false)
 (draw)
