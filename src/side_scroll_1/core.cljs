@@ -61,14 +61,15 @@
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
-  (set! t (+ t dt))
+
   (if (< y ball-radius)
     (do (*print-fn* "****** ue **********")
         (set! y ball-radius)))
 
   (if (< h y)
-    (do (*print-fn* "********* sita ***********")
-        (set! y h)))
+    (do (*print-fn* "********* sita ***********" y)
+
+        (set! y 0)))
   ;;(set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
   (if (true? right-pressed)
      (set! x (+ x dx)))
@@ -80,16 +81,21 @@
            (< ball-radius y))
     (do
       (*print-fn* "↑up pressed!" y)
-      (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+      (set! t 0)
       ;;(set! y (- y dy))
       ))
+
   
   (if (and (true? down-pressed)
            (< y h))
     (do
-      (*print-fn* "↓down pressed!" y)      
+      ;;(*print-fn* "↓down pressed!" y)
       (set! y (+ y dy))))
- 
+
+  ;; t が増えると y も増える
+  ;;(set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+
+  (set! t (+ t dt))
   (js/requestAnimationFrame draw))
 
 (js/addEventListener "keydown" key-down-handler false)
