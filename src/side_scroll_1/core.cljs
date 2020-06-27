@@ -7,9 +7,9 @@
 (def ctx (.getContext canvas "2d"))
 
 (def ball-radius 10)
-(def x ball-radius)
 (def h (- (. canvas -height) ball-radius))
 (def y h)
+(def x ball-radius)
 
 
 (def t 0)
@@ -22,30 +22,32 @@
 
 (def right-pressed false)
 (def left-pressed false)
-(def space-pressed false)
+(def down-pressed false)
+(def up-pressed false)
+
+(def key-codes {:space "Space"
+                :right "ArrowRight"
+                :left "ArrowLeft"
+                :up "ArrowUp"
+                :down "ArrowDown"})
 
 (defn key-down-handler [e]
   (let [pressed (. e -code)]
-    (if (= "Space" pressed)
-      (set! space-pressed true))
-    (if (or (= "Right" pressed)
-            (= "ArrowRight" pressed))
-      (set! right-pressed true))
-    (if (or (= "Left" pressed)
-            (= "ArrowLeft" pressed))
-      (set! left-pressed true))))
+    (condp = pressed
+      (:right key-codes) (set! right-pressed true)
+      (:left key-codes) (set! left-pressed true)
+      (:down key-codes) (set! down-pressed true)
+      (:up key-codes) (set! up-pressed true)
+      (:space key-codes) (set! up-pressed true))))
 
 (defn key-up-handler [e]
   (let [pressed (. e -code)]
-    (if (= "Space" pressed)
-      (set! space-pressed false))
-    (if (or (= "Right" pressed)
-            (= "ArrowRight" pressed))
-      (set! right-pressed false))
-    (if (or (= "Left" pressed)
-            (= "ArrowLeft" pressed))
-      (set! left-pressed false))))
-
+    (condp = pressed
+      (:right key-codes) (set! right-pressed false)
+      (:left key-codes) (set! left-pressed false)
+      (:down key-codes) (set! down-pressed false)
+      (:up key-codes) (set! up-pressed false)
+      (:space key-codes) (set! up-pressed false))))
 
 (defn draw-ball []
   (.beginPath ctx)
@@ -69,8 +71,11 @@
     (set! x (- x dx)))
 
   ;; スペースが押されたか
-  (if (true? space-pressed)
+  (if (true? up-pressed)
     (set! y (- y dy)))
+
+  (if (true? down-pressed)
+    (set! y (+ y dy)))
 
   (js/requestAnimationFrame draw))
 
