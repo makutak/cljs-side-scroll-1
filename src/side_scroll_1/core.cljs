@@ -38,7 +38,8 @@
       (:left key-codes) (set! left-pressed true)
       (:down key-codes) (set! down-pressed true)
       (:up key-codes) (set! up-pressed true)
-      (:space key-codes) (set! up-pressed true))))
+      (:space key-codes) (set! up-pressed true)
+      nil)))
 
 (defn key-up-handler [e]
   (let [pressed (. e -code)]
@@ -47,7 +48,8 @@
       (:left key-codes) (set! left-pressed false)
       (:down key-codes) (set! down-pressed false)
       (:up key-codes) (set! up-pressed false)
-      (:space key-codes) (set! up-pressed false))))
+      (:space key-codes) (set! up-pressed false)
+      nil)))
 
 (defn draw-ball []
   (.beginPath ctx)
@@ -60,23 +62,34 @@
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
   (set! t (+ t dt))
+  (if (< y ball-radius)
+    (do (*print-fn* "****** ue **********")
+        (set! y ball-radius)))
+
+  (if (< h y)
+    (do (*print-fn* "********* sita ***********")
+        (set! y h)))
   ;;(set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
-
-  ;; 右が押されたか
   (if (true? right-pressed)
-    (set! x (+ x dx)))
+     (set! x (+ x dx)))
 
-  ;; 左が押されたか
   (if (true? left-pressed)
     (set! x (- x dx)))
 
-  ;; スペースが押されたか
-  (if (true? up-pressed)
-    (set! y (- y dy)))
-
-  (if (true? down-pressed)
-    (set! y (+ y dy)))
-
+  (if (and (true? up-pressed)
+           (< ball-radius y))
+    (do
+      (*print-fn* "↑up pressed!" y)
+      (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+      ;;(set! y (- y dy))
+      ))
+  
+  (if (and (true? down-pressed)
+           (< y h))
+    (do
+      (*print-fn* "↓down pressed!" y)      
+      (set! y (+ y dy))))
+ 
   (js/requestAnimationFrame draw))
 
 (js/addEventListener "keydown" key-down-handler false)
