@@ -8,13 +8,13 @@
 
 (def ball-radius 10)
 (def h (- (. canvas -height) ball-radius))
+(def w (- (. canvas -width) ball-radius))
 (def y h)
 (def x ball-radius)
 
 
 (def t 0)
 (def dt 1)
-(def v 10)
 ;;(def g 9.8)
 (def g 0.4)
 (def dx 10)
@@ -30,6 +30,8 @@
                 :left "ArrowLeft"
                 :up "ArrowUp"
                 :down "ArrowDown"})
+
+(def is-jump false)
 
 (defn key-down-handler [e]
   (let [pressed (. e -code)]
@@ -68,34 +70,39 @@
 
   (if (< h y)
     (do (*print-fn* "********* sita ***********" y)
+        (set! is-jump false)
+        (set! y h)))
 
-        (set! y 0)))
-  ;;(set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+  (if (< x ball-radius)
+    (set! x ball-radius))
+
+  (if (< w x)
+    (set! x w))
+
   (if (true? right-pressed)
-     (set! x (+ x dx)))
+    (set! x (+ x dx)))
 
   (if (true? left-pressed)
     (set! x (- x dx)))
 
   (if (and (true? up-pressed)
-           (< ball-radius y))
+           (< ball-radius y)
+           (not is-jump))
     (do
       (*print-fn* "↑up pressed!" y)
       (set! t 0)
-      ;;(set! y (- y dy))
-      ))
+      (set! is-jump true)))
 
-  
   (if (and (true? down-pressed)
            (< y h))
-    (do
-      ;;(*print-fn* "↓down pressed!" y)
-      (set! y (+ y dy))))
+    (set! y (+ y dy)))
 
   ;; t が増えると y も増える
-  ;;(set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+  ;; -> jump のときだけ t が増えてほしい
+  (if (true? is-jump)
+    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+        (set! t (+ t dt))))
 
-  (set! t (+ t dt))
   (js/requestAnimationFrame draw))
 
 (js/addEventListener "keydown" key-down-handler false)
