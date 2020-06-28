@@ -65,7 +65,7 @@
     (.beginPath ctx)
     (.rect ctx (+ (* 30 n) (/ w 2)) (- (+ h ball-radius) (* 30 n)) 30 (* 30 n))
     ;;(.rect ctx (/ w 2) (- (+ h ball-radius) 40) 40 40)
-    (aset ctx "fillStyle" "#A52A2A")
+    (aset ctx "fillStyle" "#8B4513")
     (.fill ctx)
     (.closePath ctx)))
 
