@@ -60,9 +60,19 @@
   (.fill ctx)
   (.closePath ctx))
 
+(defn draw-brock []
+  (dotimes [n 8]
+    (.beginPath ctx)
+    (.rect ctx (+ (* 30 n) (/ w 2)) (- (+ h ball-radius) (* 30 n)) 30 (* 30 n))
+    ;;(.rect ctx (/ w 2) (- (+ h ball-radius) 40) 40 40)
+    (aset ctx "fillStyle" "#A52A2A")
+    (.fill ctx)
+    (.closePath ctx)))
+
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
+  (draw-brock)
 
   (if (< y ball-radius)
     (do (*print-fn* "****** ue **********")
