@@ -17,7 +17,7 @@
 (def dt 1)
 ;;(def g 9.8)
 (def g 0.4)
-(def dx 10)
+(def dx 5)
 (def dy 10)
 
 (def right-pressed false)
