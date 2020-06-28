@@ -33,6 +33,22 @@
 
 (def is-jump false)
 
+(def MAP [[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+          [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+          [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
+          [0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1]
+          [0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1]
+          [0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1]
+          [0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1]
+          [0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1]
+          [0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1]
+          [0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1]
+          [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]])
+
+(def block-row-count (count MAP))
+(def block-column-count (count (first MAP)))
+(def block-width 30)
+
 (defn key-down-handler [e]
   (let [pressed (. e -code)]
     (condp = pressed
@@ -60,20 +76,31 @@
   (.fill ctx)
   (.closePath ctx))
 
-(defn draw-brock []
-  (dotimes [n 8]
-    (.beginPath ctx)
-    (.rect ctx (+ (* 30 n) (/ w 2)) (- (+ h ball-radius) (* 30 n)) 30 (* 30 n))
-    ;;(.rect ctx (/ w 2) (- (+ h ball-radius) 40) 40 40)
-    (aset ctx "fillStyle" "#8B4513")
-    (.fill ctx)
-    (.closePath ctx)))
+;; (defn draw-block []
+;;   (.beginPath ctx)
+;;   (.rect ctx 450 450 30 30)
+;;   ;;(.rect ctx (/ w 2) (- (+ h ball-radius) 40) 40 40)
+;;   (aset ctx "fillStyle" "#8B4513")
+;;   (.fill ctx)
+;;   (.closePath ctx))
+
+(defn draw-map []
+  (dotimes [c block-column-count]
+    (dotimes [r block-row-count]
+      (if (= 1 (get-in MAP [r c]))
+        (do
+          (let [block-x (* c 30)
+                block-y (* r 30)]
+            (.beginPath ctx)
+            (.rect ctx block-x block-y block-width block-width)
+            (aset ctx "fillStyle" "#8B4513")
+            (.fill ctx)
+            (.closePath ctx)))))))
 
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
-  (draw-brock)
-
+  (draw-map)
   (if (< y ball-radius)
     (do (*print-fn* "****** ue **********")
         (set! y ball-radius)))
