@@ -149,7 +149,7 @@
   ;; t が増えると y も増える
   ;; -> jump のときだけ t が増えてほしい
   (if (true? is-jump)
-    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h) )
+    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
         (set! t (+ t dt))))
 
   (js/requestAnimationFrame draw))
