@@ -125,7 +125,7 @@
       (println "x: " x)
       (println "x/30: " (/ x 30))
       (println "y/30: " (/ y 30))
-      (if (not (is-collision (int (/ x 30)) (int (/ y 30))))
+      (if (not (is-collision (int (/ (+ x ball-radius) 30)) (int (/ y 30))))
         (set! x (+ x dx)))))
 
   (if (true? left-pressed)
