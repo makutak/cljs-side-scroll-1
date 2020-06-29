@@ -42,8 +42,8 @@
           [0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1]
           [0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1]
           [0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1]
-          [0 0 0 0 0 0 0 0 0 1 1 1 1 1 1 1]
-          [0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1]])
+          [0 0 1 0 0 0 0 0 0 1 1 1 1 1 1 1]
+          [0 0 1 0 0 0 0 0 1 1 1 1 1 1 1 1]])
 
 (def block-row-count (count MAP))
 (def block-column-count (count (first MAP)))
@@ -89,8 +89,8 @@
     (dotimes [r block-row-count]
       (if (= 1 (get-in MAP [r c]))
         (do
-          (let [block-x (* c 30)
-                block-y (* r 30)]
+          (let [block-x (* c block-width)
+                block-y (* r block-width)]
             (.beginPath ctx)
             (.rect ctx block-x block-y block-width block-width)
             (aset ctx "fillStyle" "#8B4513")
@@ -99,12 +99,18 @@
 
 
 (defn is-collision [x y]
-  (= 1 (get-in MAP [x y])))
+  (= 1 (get-in MAP [y x])))
 
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
   (draw-map)
+
+  ;; (if (is-collision (int (/ (+ x ball-radius) block-width)) (int (/ y block-width)))
+  ;;   (do
+  ;;     (println "collision: X: " x " " "collision: Y: " y)
+  ;;     (set! y (- y ball-radius))))
+
   (if (< y ball-radius)
     (do (*print-fn* "****** ue **********")
         (set! y ball-radius)))
@@ -121,19 +127,16 @@
     (set! x w))
 
   (if (true? right-pressed)
-    (do
-      (println "x: " x)
-      (println "x/30: " (/ x 30))
-      (println "y/30: " (/ y 30))
-      (if (not (is-collision (int (/ (+ x ball-radius) 30)) (int (/ y 30))))
-        (set! x (+ x dx)))))
+    (if (not (is-collision (int (/ (+ x (inc ball-radius)) block-width)) (int (/ y block-width))))
+      (set! x (+ x dx))))
 
   (if (true? left-pressed)
-    (set! x (- x dx)))
+    (if (not (is-collision (int (/ (- x (inc ball-radius)) block-width)) (int (/ y block-width))))
+      (set! x (- x dx))))
 
   (if (and (true? up-pressed)
            (< ball-radius y)
-           (not is-jump))
+           (false? is-jump))
     (do
       (*print-fn* "↑up pressed!" y)
       (set! t 0)
@@ -146,7 +149,7 @@
   ;; t が増えると y も増える
   ;; -> jump のときだけ t が増えてほしい
   (if (true? is-jump)
-    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
+    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h) )
         (set! t (+ t dt))))
 
   (js/requestAnimationFrame draw))
