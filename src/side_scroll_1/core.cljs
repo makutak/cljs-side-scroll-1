@@ -97,6 +97,10 @@
             (.fill ctx)
             (.closePath ctx)))))))
 
+
+(defn is-collision [x y]
+  (= 1 (get-in MAP [x y])))
+
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
@@ -117,7 +121,12 @@
     (set! x w))
 
   (if (true? right-pressed)
-    (set! x (+ x dx)))
+    (do
+      (println "x: " x)
+      (println "x/30: " (/ x 30))
+      (println "y/30: " (/ y 30))
+      (if (not (is-collision (int (/ x 30)) (int (/ y 30))))
+        (set! x (+ x dx)))))
 
   (if (true? left-pressed)
     (set! x (- x dx)))
