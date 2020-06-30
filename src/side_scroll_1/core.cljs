@@ -9,9 +9,6 @@
 (def ball-radius 10)
 (def h (- (. canvas -height) ball-radius))
 (def w (- (. canvas -width) ball-radius))
-(def y h)
-(def x ball-radius)
-
 
 (def t 0)
 (def dt 1)
@@ -40,14 +37,17 @@
           [0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 1]
           [0 0 0 0 0 0 0 0 0 0 0 0 0 1 1 1]
           [0 0 0 0 0 0 0 0 0 0 0 0 1 1 1 1]
-          [0 0 0 0 0 0 0 0 0 0 0 1 1 1 1 1]
+          [0 0 0 0 1 1 0 0 0 0 0 1 1 1 1 1]
           [0 0 0 0 0 0 0 0 0 0 1 1 1 1 1 1]
           [0 0 1 0 0 0 0 0 0 1 1 1 1 1 1 1]
-          [0 0 1 0 0 0 0 0 1 1 1 1 1 1 1 1]])
+          [1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1]])
 
 (def block-row-count (count MAP))
 (def block-column-count (count (first MAP)))
 (def block-width 30)
+
+(def y (- h block-width))
+(def x ball-radius)
 
 (defn key-down-handler [e]
   (let [pressed (. e -code)]
@@ -101,24 +101,23 @@
 (defn is-collision [x y]
   (= 1 (get-in MAP [y x])))
 
+(defn get-height [current]
+  (if (= current 1)
+    (let [current-y (int (/ (+ y block-width) block-width))]
+      (println "current current-y: " current-y)
+      (println "current height: " (- block-row-count current-y))
+      (- block-row-count current-y))
+    1))
+
+
 (defn draw []
   (.clearRect ctx 0 0 (. canvas -width) (. canvas -height))
   (draw-ball)
   (draw-map)
 
-  ;; (if (is-collision (int (/ (+ x ball-radius) block-width)) (int (/ y block-width)))
-  ;;   (do
-  ;;     (println "collision: X: " x " " "collision: Y: " y)
-  ;;     (set! y (- y ball-radius))))
-
   (if (< y ball-radius)
     (do (*print-fn* "****** ue **********")
         (set! y ball-radius)))
-
-  (if (< h y)
-    (do (*print-fn* "********* sita ***********" y)
-        (set! is-jump false)
-        (set! y h)))
 
   (if (< x ball-radius)
     (set! x ball-radius))
@@ -127,33 +126,48 @@
     (set! x w))
 
   (if (true? right-pressed)
-    (if (not (is-collision (int (/ (+ x ball-radius) (dec block-width)))
-                           (int (/ y block-width))))
-      (set! x (+ x dx))))
+    (let [xt (+ x dx)]
+      (if (not (is-collision (int (/ (+ xt ball-radius)  block-width))
+                             (int (/ y block-width))))
+        (set! x xt))))
 
   (if (true? left-pressed)
-    (if (not (is-collision (int (/ (- x ball-radius) (inc block-width)))
-                           (int (/ y block-width))))
-      (set! x (- x dx))))
+    (let [xt (- x dx)]
+      (if (not (is-collision (int (/ (- xt ball-radius)  block-width))
+                             (int (/ y block-width))))
+        (set! x xt))))
 
   (if (and (true? up-pressed)
            (< ball-radius y)
-           (false? is-jump))
+           (false? is-jump)
+           )
     (do
       (*print-fn* "↑up pressed!" y)
       (set! t 0)
       (set! is-jump true)))
 
-  (if (and (true? down-pressed)
-           (< y h))
-    (set! y (+ y dy)))
+  (if (true? down-pressed)
+    (let [yt (+ y dy)]
+      (if(not (is-collision (int (/ x  block-width))
+                            (int (/ yt block-width))))
+        (set! y yt))))
 
   ;; t が増えると y も増える
   ;; -> jump のときだけ t が増えてほしい
   (if (true? is-jump)
-    (do (set! y (+ (- (* (/ 1 2) g (* t t)) (* dy t)) h))
-        (set! t (+ t dt))))
-
+    ;;(println "is-jump: " is-jump)
+    (let [current (get-in MAP [(int (/ (+ y block-width) block-width)) (int (/ x block-width))])
+          yt (+ (- (* (/ 1 2) g (* t t)) (* dy t)) (- h (* (get-height current) block-width)) )]
+      (if (not (is-collision (int (/ x block-width))
+                             (int (/ yt block-width))))
+        (do
+          (println "++++ jumping!!!!")
+          (println (get-height current))
+          (set! y yt))
+        (do
+          (println "---- stopping!!!")
+          (set! is-jump false)))))
+  (set! t (+ t dt))
   (js/requestAnimationFrame draw))
 
 (js/addEventListener "keydown" key-down-handler false)
