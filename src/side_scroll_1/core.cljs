@@ -127,11 +127,13 @@
     (set! x w))
 
   (if (true? right-pressed)
-    (if (not (is-collision (int (/ (+ x (inc ball-radius)) block-width)) (int (/ y block-width))))
+    (if (not (is-collision (int (/ (+ x ball-radius) (dec block-width)))
+                           (int (/ y block-width))))
       (set! x (+ x dx))))
 
   (if (true? left-pressed)
-    (if (not (is-collision (int (/ (- x (inc ball-radius)) block-width)) (int (/ y block-width))))
+    (if (not (is-collision (int (/ (- x ball-radius) (inc block-width)))
+                           (int (/ y block-width))))
       (set! x (- x dx))))
 
   (if (and (true? up-pressed)
